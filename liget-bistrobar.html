@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Liget BistroBar – Dabas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ── RESET & BASE ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Lato', sans-serif;
+      color: #253d2e;
+      background: #f4fbf6;
+      line-height: 1.7;
+    }
+
+    /* ── PALETTE ── */
+    :root {
+      --cream:      #f4fbf6;
+      --warm:       #e8f5ec;
+      --sand:       #c6dfd0;
+      --terracotta: #3d9158;
+      --rust:       #2a6e3f;
+      --brown:      #1e4d32;
+      --dark:       #132b1e;
+      --olive:      #5a7a60;
+      --text:       #253d2e;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 48px;
+      background: rgba(19, 43, 30, 0.93);
+      backdrop-filter: blur(6px);
+      transition: background 0.3s;
+    }
+    nav .logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      color: #e8f5ec;
+      letter-spacing: 1px;
+    }
+    nav .logo span { color: #6fcf8e; }
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 32px;
+    }
+    nav ul li a {
+      color: #a8c9b5;
+      text-decoration: none;
+      font-size: 0.88rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    nav ul li a:hover { color: var(--terracotta); }
+    nav .nav-cta {
+      background: var(--terracotta);
+      color: #fff !important;
+      padding: 8px 20px;
+      border-radius: 4px;
+    }
+    nav .nav-cta:hover { background: var(--rust) !important; color: #fff !important; }
+    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; }
+    .hamburger span { width: 24px; height: 2px; background: #f5ede0; display: block; }
+
+    /* ── HERO ── */
+    #hero {
+      min-height: 100vh;
+      background:
+        linear-gradient(to bottom, rgba(13,40,22,0.58) 0%, rgba(13,40,22,0.38) 60%, rgba(13,40,22,0.72) 100%),
+        url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1600&q=80') center/cover no-repeat;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 120px 24px 80px;
+    }
+    .hero-inner { max-width: 720px; }
+    .hero-tag {
+      display: inline-block;
+      font-size: 0.78rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--terracotta);
+      border: 1px solid var(--terracotta);
+      padding: 6px 18px;
+      border-radius: 2px;
+      margin-bottom: 24px;
+    }
+    .hero-inner h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.8rem, 7vw, 5rem);
+      color: #fdf8f2;
+      line-height: 1.15;
+      margin-bottom: 20px;
+    }
+    .hero-inner h1 em { font-style: italic; color: #b2e4c4; }
+    .hero-inner p {
+      font-size: 1.1rem;
+      color: #c2e0ce;
+      margin-bottom: 40px;
+      font-weight: 300;
+    }
+    .hero-buttons { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+    .btn-primary {
+      background: var(--terracotta);
+      color: #fff;
+      padding: 14px 36px;
+      border: none;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .btn-primary:hover { background: var(--rust); transform: translateY(-2px); }
+    .btn-outline {
+      background: transparent;
+      color: #fdf8f2;
+      padding: 14px 36px;
+      border: 1px solid rgba(253,248,242,0.5);
+      border-radius: 4px;
+      font-size: 0.9rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      cursor: pointer;
+      text-decoration: none;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .btn-outline:hover { border-color: #fdf8f2; color: #fdf8f2; }
+    .scroll-hint {
+      position: absolute;
+      bottom: 36px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: rgba(253,248,242,0.5);
+      font-size: 0.75rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      animation: bob 2s ease-in-out infinite;
+    }
+    .scroll-hint::after {
+      content: '';
+      width: 1px;
+      height: 40px;
+      background: rgba(253,248,242,0.3);
+    }
+    @keyframes bob { 0%,100%{transform:translateX(-50%) translateY(0)} 50%{transform:translateX(-50%) translateY(8px)} }
+
+    /* ── SECTION SHARED ── */
+    section { position: relative; }
+    .section-header {
+      text-align: center;
+      margin-bottom: 56px;
+    }
+    .section-tag {
+      display: inline-block;
+      font-size: 0.72rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--terracotta);
+      margin-bottom: 12px;
+    }
+    .section-header h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 4vw, 2.8rem);
+      color: var(--brown);
+      line-height: 1.2;
+    }
+    .section-header p {
+      margin-top: 16px;
+      color: #7a6a55;
+      max-width: 560px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .divider {
+      width: 48px;
+      height: 2px;
+      background: var(--terracotta);
+      margin: 16px auto 0;
+    }
+
+    /* ── ABOUT ── */
+    #about {
+      background: var(--cream);
+      padding: 100px 24px;
+    }
+    .about-grid {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 64px;
+      align-items: center;
+    }
+    .about-img-wrap {
+      position: relative;
+    }
+    .about-img-wrap img {
+      width: 100%;
+      height: 480px;
+      object-fit: cover;
+      border-radius: 6px;
+      display: block;
+    }
+    .about-badge {
+      position: absolute;
+      bottom: -24px;
+      right: -24px;
+      width: 120px;
+      height: 120px;
+      background: var(--terracotta);
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      text-align: center;
+      font-family: 'Playfair Display', serif;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+    }
+    .about-badge .year { font-size: 1.8rem; font-weight: 700; line-height: 1; }
+    .about-badge .year-label { font-size: 0.65rem; letter-spacing: 1.5px; text-transform: uppercase; margin-top: 4px; opacity: 0.85; }
+    .about-text .section-header { text-align: left; margin-bottom: 24px; }
+    .about-text .section-header h2 { font-size: clamp(1.8rem, 3vw, 2.4rem); }
+    .about-text p { color: #4e6e58; margin-bottom: 16px; }
+    .about-features {
+      margin-top: 32px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .about-feature {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+    .feature-icon {
+      font-size: 1.4rem;
+      margin-top: 2px;
+      flex-shrink: 0;
+    }
+    .feature-label { font-weight: 700; font-size: 0.9rem; color: var(--brown); margin-bottom: 2px; }
+    .feature-desc { font-size: 0.82rem; color: #6a8f75; }
+
+    /* ── MENU ── */
+    #menu {
+      background: var(--warm);
+      padding: 100px 24px;
+    }
+    .menu-inner { max-width: 1100px; margin: 0 auto; }
+    .menu-tabs {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 48px;
+    }
+    .tab-btn {
+      padding: 10px 26px;
+      border: 1px solid var(--sand);
+      background: transparent;
+      color: #4a6e56;
+      font-family: 'Lato', sans-serif;
+      font-size: 0.85rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      border-radius: 40px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .tab-btn.active, .tab-btn:hover {
+      background: var(--terracotta);
+      border-color: var(--terracotta);
+      color: #fff;
+    }
+    .menu-panel { display: none; }
+    .menu-panel.active { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; }
+    .menu-item {
+      background: var(--cream);
+      padding: 24px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      transition: background 0.2s;
+    }
+    .menu-item:hover { background: #fff; }
+    .menu-item-info h4 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.05rem;
+      color: var(--brown);
+      margin-bottom: 4px;
+    }
+    .menu-item-info p { font-size: 0.82rem; color: #6a907a; }
+    .menu-item-price {
+      font-family: 'Playfair Display', serif;
+      color: var(--terracotta);
+      font-size: 1rem;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .menu-note {
+      text-align: center;
+      margin-top: 40px;
+      color: #6a907a;
+      font-size: 0.85rem;
+    }
+    .menu-note a { color: var(--terracotta); text-decoration: none; }
+
+    /* ── GALLERY ── */
+    #gallery {
+      background: var(--cream);
+      padding: 100px 24px;
+    }
+    .gallery-grid {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: 260px 260px;
+      gap: 12px;
+    }
+    .gallery-item {
+      overflow: hidden;
+      border-radius: 4px;
+      position: relative;
+    }
+    .gallery-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.5s;
+    }
+    .gallery-item:hover img { transform: scale(1.06); }
+    .gallery-item.tall { grid-row: span 2; }
+    .gallery-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(44,30,15,0);
+      transition: background 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 1.8rem;
+      opacity: 0;
+    }
+    .gallery-item:hover .gallery-overlay { background: rgba(44,30,15,0.25); opacity: 1; }
+
+    /* ── CONTACT ── */
+    #contact {
+      background: var(--dark);
+      padding: 100px 24px;
+    }
+    #contact .section-header h2 { color: #e8f5ec; }
+    #contact .section-header p { color: #90b89e; }
+    #contact .section-tag { color: #6fcf8e; }
+    .contact-grid {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      align-items: start;
+    }
+    .contact-info { display: flex; flex-direction: column; gap: 28px; }
+    .contact-block { display: flex; gap: 18px; align-items: flex-start; }
+    .contact-icon {
+      width: 44px;
+      height: 44px;
+      background: rgba(61,145,88,0.18);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+    .contact-block-text h4 { color: #c8e8d4; font-size: 0.85rem; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px; }
+    .contact-block-text p, .contact-block-text a { color: #90b89e; font-size: 0.95rem; text-decoration: none; }
+    .contact-block-text a:hover { color: var(--terracotta); }
+    .hours-table { display: grid; grid-template-columns: auto 1fr; gap: 4px 16px; color: #90b89e; font-size: 0.9rem; }
+    .hours-table .day { color: #c8e8d4; font-weight: 700; }
+    .contact-map {
+      border-radius: 8px;
+      overflow: hidden;
+      height: 360px;
+      background: #1a3326;
+    }
+    .contact-map iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      filter: grayscale(40%) sepia(20%);
+    }
+    .map-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #1a3326;
+      color: #a89880;
+      gap: 12px;
+      border-radius: 8px;
+    }
+    .map-placeholder .map-icon { font-size: 3rem; }
+    .map-placeholder p { font-size: 0.85rem; text-align: center; max-width: 200px; }
+    .map-placeholder a {
+      color: var(--terracotta);
+      text-decoration: none;
+      font-size: 0.85rem;
+      border: 1px solid var(--terracotta);
+      padding: 8px 18px;
+      border-radius: 4px;
+      margin-top: 8px;
+    }
+    .contact-form { display: flex; flex-direction: column; gap: 16px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group label { color: #c8e8d4; font-size: 0.78rem; letter-spacing: 1px; text-transform: uppercase; }
+    .form-group input,
+    .form-group textarea {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: #f5ede0;
+      padding: 12px 16px;
+      border-radius: 4px;
+      font-family: 'Lato', sans-serif;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .form-group input:focus,
+    .form-group textarea:focus { border-color: var(--terracotta); }
+    .form-group textarea { height: 120px; resize: vertical; }
+    .form-group input::placeholder,
+    .form-group textarea::placeholder { color: #4a6e58; }
+
+    /* ── SOCIAL BAR ── */
+    .social-bar {
+      background: #2a5e3e;
+      padding: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+    }
+    .social-bar p { color: #a8ccb8; font-size: 0.85rem; }
+    .social-link {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #f5ede0;
+      text-decoration: none;
+      font-size: 0.85rem;
+      padding: 8px 18px;
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 4px;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .social-link:hover { border-color: var(--terracotta); color: var(--terracotta); }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--dark);
+      border-top: 1px solid rgba(255,255,255,0.05);
+      padding: 32px 24px;
+      text-align: center;
+      color: #5a8a6a;
+      font-size: 0.8rem;
+    }
+    footer .footer-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem;
+      color: #e8f5ec;
+      margin-bottom: 8px;
+    }
+    footer .footer-logo span { color: #6fcf8e; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      nav { padding: 16px 24px; }
+      nav ul { display: none; }
+      .hamburger { display: flex; }
+      .about-grid { grid-template-columns: 1fr; }
+      .about-img-wrap { order: -1; }
+      .about-img-wrap img { height: 320px; }
+      .about-badge { right: 12px; bottom: -18px; width: 96px; height: 96px; }
+      .menu-panel.active { grid-template-columns: 1fr; }
+      .gallery-grid { grid-template-columns: 1fr 1fr; grid-template-rows: auto; }
+      .gallery-item.tall { grid-row: span 1; }
+      .contact-grid { grid-template-columns: 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 480px) {
+      .gallery-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="logo">Liget <span>Bistro</span>Bar</div>
+    <ul>
+      <li><a href="#about">Rólunk</a></li>
+      <li><a href="#menu">Étlap</a></li>
+      <li><a href="#gallery">Galéria</a></li>
+      <li><a href="#contact" class="nav-cta">Foglalás</a></li>
+    </ul>
+    <div class="hamburger">
+      <span></span><span></span><span></span>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section id="hero" style="position:relative;">
+    <div class="hero-inner">
+      <div class="hero-tag">Dabas szíve ♦ Barátságos légkör</div>
+      <h1>Ahol minden falat<br/><em>egy kis örömöt</em> rejt</h1>
+      <p>Friss, házilagos ízek, otthonos hangulat és egy pohár bor a nap végén.<br/>Üdvözlünk a Liget BistroBarban!</p>
+      <div class="hero-buttons">
+        <a href="#menu" class="btn-primary">Étlap megtekintése</a>
+        <a href="#contact" class="btn-outline">Asztalfoglalás</a>
+      </div>
+    </div>
+    <div class="scroll-hint">Görgess le</div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <div class="about-grid">
+      <div class="about-img-wrap">
+        <img src="https://images.unsplash.com/photo-1559339352-11d035aa65de?w=800&q=80" alt="Liget BistroBar belső tér" />
+        <div class="about-badge">
+          <div class="year">&#128919;</div>
+          <div class="year-label">Dabas</div>
+        </div>
+      </div>
+      <div class="about-text">
+        <div class="section-header">
+          <div class="section-tag">A mi történetünk</div>
+          <h2>Egy hely, ahol szívesen töltöd az időt</h2>
+          <div class="divider" style="margin:16px 0 0;"></div>
+        </div>
+        <p>A Liget BistroBar Dabas egyik kedvelt találkozóhelye. Legyen szó egy laza ebédről, esti italozásról barátokkal vagy egy különleges alkalom megünnepléséről – nálunk mindig otthon érezheted magad.</p>
+        <p>Kínálatunkban gondosan válogatott ételek, friss alapanyagok és egy hangulatos, barátságos ambiente várja vendégeinket. Szakácsaink minden fogásba beleadják a szívüket.</p>
+        <div class="about-features">
+          <div class="about-feature">
+            <div class="feature-icon">🍽️</div>
+            <div>
+              <div class="feature-label">Napi menü</div>
+              <div class="feature-desc">Friss, szezonális ajánlatok minden nap</div>
+            </div>
+          </div>
+          <div class="about-feature">
+            <div class="feature-icon">🍷</div>
+            <div>
+              <div class="feature-label">Italválaszték</div>
+              <div class="feature-desc">Bor, koktél, kézműves sör és több</div>
+            </div>
+          </div>
+          <div class="about-feature">
+            <div class="feature-icon">🎉</div>
+            <div>
+              <div class="feature-label">Rendezvények</div>
+              <div class="feature-desc">Privát foglalás és különleges alkalmak</div>
+            </div>
+          </div>
+          <div class="about-feature">
+            <div class="feature-icon">📍</div>
+            <div>
+              <div class="feature-label">Dabas szíve</div>
+              <div class="feature-desc">Könnyű megközelíthetőség, saját parkoló</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MENU -->
+  <section id="menu">
+    <div class="menu-inner">
+      <div class="section-header">
+        <div class="section-tag">Étlap &amp; Italok</div>
+        <h2>Ami a tányéron van</h2>
+        <div class="divider"></div>
+        <p>Friss alapanyagokból készült, igazi házilagos ízvilág – minden nap.</p>
+      </div>
+
+      <div class="menu-tabs">
+        <button class="tab-btn active" onclick="switchTab('eloetel', this)">Előételek</button>
+        <button class="tab-btn" onclick="switchTab('foetel', this)">Főételek</button>
+        <button class="tab-btn" onclick="switchTab('desszert', this)">Desszertek</button>
+        <button class="tab-btn" onclick="switchTab('italok', this)">Italok</button>
+      </div>
+
+      <!-- ELŐÉTELEK -->
+      <div class="menu-panel active" id="eloetel">
+        <div class="menu-item">
+          <div class="menu-item-info">
+            <h4>Házi savanyúság tál</h4>
+            <p>Szezonális savanyítványok, friss kenyérrel</p>
+          </div>
+          <div class="menu-item-price">[ár] Ft</div>
+        </div>
+        <div class="menu-item">
+          <div class="menu-item-info">
+            <h4>Liget kenyérkosár</h4>
+            <p>Frissen sült kenyér, vajkrémmel, lilahagymás lekvárral</p>
+          </div>
+          <div class="menu-item-price">[ár] Ft</div>
+        </div>
+        <div class="menu-item">
+          <div class="menu-item-info">
+            <h4>Gombaleves</h4>
+            <p>Erdei gombákból, tejföllel és friss petrezselyemmel</p>
+          </div>
+          <div class="menu-item-price">[ár] Ft</div>
+        </div>
+        <div class="menu-item">
+          <div class="menu-item-info">
+            <h4>Mozzarella saláta</h4>
+            <p>Koktélparadicsom, friss bazsalikom, extra szűz olívaolaj</p>
+          </div>
+          <div class="menu-item-price">[ár] Ft</div>
+        </div>
+        <div class="menu-item">
+          <div class="menu-item-info">
+            <h4>Rántott camembert</h4>
+            <p>Áfonyalekvárral, pirított zsemlével</p>
+          </div>
+          <div class="menu-item-price">[ár] Ft</div>
+        </div>
+        <div class="menu-item">
+          <div class="menu-item-info">
+            <h4>Csirkeszárny – pikáns</h4>
+            <p>Házi fűszeres pác, fokhagymás dipszósz</p>
+          </div>
+          <div class="menu-item-price">[ár] Ft</div>
+        </div>
+      </div>
+
+      <!-- FŐÉTELEK -->
+      <div class="menu-panel" id="foetel">
+        <div class="menu-item">
+          <div class="menu-item-info">
+            <h4>Sertés roston</h4>
+            <p>Grillezett sertéstarja, sült krumplival, szezonális salátával</p>
+          </div>
+          <div class="menu-item-price">[ár] Ft</div>
+        </div>
+        <div class="menu-item">
+          <div class="menu-item-info">
+            <h4>Csirkemell pesto szószban</h4>
+            <p>Friss bazsalikomos pesto, párolt zöldségek, hasábburgonya</p>
+          </div>
+          <div class="menu-item-price">[ár] Ft</div>
+        </div>
+        <div class="menu-item">
+          <div class="menu-item-info">
+            <h4>Hamburger – Liget módra</h4>
+            <p>Házi péksütemény, marhahús, karamellizált hagyma, saját szósz</p>
+          </div>
+          <div class="menu-item-price">[ár] Ft</div>
+        </div>
+        <div class="menu-item">
+          <div class="menu-item-info">
+            <h4>Rántott csirkemell</h4>
+            <p>Párolt rizs, tartármártás, citromkarika</p>
+          </div>
+          <div class="menu-item-price">[ár] Ft</div>
+        </div>
+        <div class="menu-item">
+          <div class="menu-item-info">
+            <h4>Vegetáriánus tál</h4>
+            <p>Szezonális sült zöldségek, humusz, pitta</p>
+          </div>
+          <div class="menu-item-price">[ár] Ft</div>
+        </div>
+        <div class="menu-item">
+          <div class="menu-item-info">
+            <h4>Napi ajánlat</h4>
+            <p>Leves + főfogás – kérdezze a felszolgálót!</p>
+          </div>
+          <div class="menu-item-price">[ár] Ft</div>
+        </div>
+      </div>
+
+      <!-- DESSZERTEK -->
+      <div class="menu-panel" id="desszert">
+        <div class="menu-item">
+          <div class="menu-item-info">
+            <h4>Házi palacsinta</h4>
+            <p>Nutellával, eperlekvárral vagy túróval töltve</p>
+          </div>
+          <div class="menu-item-price">[ár] Ft</div>
+        </div>
+        <div class="menu-item">
+          <div class="menu-item-info">
+            <h4>Somlói galuska</h4>
+            <p>Klasszikus, dióval és tejszínhabbal</p>
+          </div>
+          <div class="menu-item-price">[ár] Ft</div>
+        </div>
+        <div class="menu-item">
+          <div class="menu-item-info">
+            <h4>Brownie fagylalttal</h4>
+            <p>Meleg csokis brownie, vanília gombóc</p>
+          </div>
+          <div class="menu-item-price">[ár] Ft</div>
+        </div>
+        <div class="menu-item">
+          <div class="menu-item-info">
+            <h4>Szezonális gyümölcsös sütemény</h4>
+            <p>A pékség mai ajánlata</p>
+          </div>
+          <div class="menu-item-price">[ár] Ft</div>
+        </div>
+      </div>
+
+      <!-- ITALOK -->
+      <div class="menu-panel" id="italok">
+        <div class="menu-item">
+          <div class="menu-item-info">
+            <h4>Házi limonádé</h4>
+            <p>Frissen facsart, mentával, 5 dl</p>
+          </div>
+          <div class="menu-item-price">[ár] Ft</div>
+        </div>
+        <div class="menu-item">
+          <div class="menu-item-info">
+            <h4>Espresso / Cappuccino</h4>
+            <p>Prémium arabica kávéból</p>
+          </div>
+          <div class="menu-item-price">[ár] Ft</div>
+        </div>
+        <div class="menu-item">
+          <div class="menu-item-info">
+            <h4>Házi borkínálat – dl</h4>
+            <p>Fehér, rozé és vörös – kérje a mai ajánlatot</p>
+          </div>
+          <div class="menu-item-price">[ár] Ft</div>
+        </div>
+        <div class="menu-item">
+          <div class="menu-item-info">
+            <h4>Csapolt sör</h4>
+            <p>0,3 l / 0,5 l – kézműves és standard</p>
+          </div>
+          <div class="menu-item-price">[ár] Ft</div>
+        </div>
+        <div class="menu-item">
+          <div class="menu-item-info">
+            <h4>Koktél – Liget Spritz</h4>
+            <p>Aperol, prosecco, narancs, jég</p>
+          </div>
+          <div class="menu-item-price">[ár] Ft</div>
+        </div>
+        <div class="menu-item">
+          <div class="menu-item-info">
+            <h4>Alkoholmentes koktél</h4>
+            <p>Friss gyümölcsök, jégkása</p>
+          </div>
+          <div class="menu-item-price">[ár] Ft</div>
+        </div>
+      </div>
+
+      <p class="menu-note">Az étlap teljes változata helyszínen tekinthető meg, vagy <a href="#contact">kérje el tőlünk</a>!</p>
+    </div>
+  </section>
+
+  <!-- GALLERY -->
+  <section id="gallery">
+    <div class="section-header">
+      <div class="section-tag">Hangulat &amp; Élmények</div>
+      <h2>Galéria</h2>
+      <div class="divider"></div>
+      <p>Egy pillantás a Liget BistroBar hangulatára.</p>
+    </div>
+    <div class="gallery-grid" style="max-width:1100px;margin:0 auto;">
+      <div class="gallery-item tall">
+        <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=600&q=80" alt="BistroBar belső" />
+        <div class="gallery-overlay">🔍</div>
+      </div>
+      <div class="gallery-item">
+        <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&q=80" alt="Étel" />
+        <div class="gallery-overlay">🔍</div>
+      </div>
+      <div class="gallery-item">
+        <img src="https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=600&q=80" alt="Koktél" />
+        <div class="gallery-overlay">🔍</div>
+      </div>
+      <div class="gallery-item">
+        <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600&q=80" alt="Hangulat" />
+        <div class="gallery-overlay">🔍</div>
+      </div>
+      <div class="gallery-item">
+        <img src="https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=600&q=80" alt="Terasz" />
+        <div class="gallery-overlay">🔍</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <div class="section-header">
+      <div class="section-tag">Látogasson el hozzánk</div>
+      <h2>Kapcsolat &amp; Foglalás</h2>
+      <div class="divider"></div>
+      <p>Szívesen várjuk! Asztalfoglaláshoz hívjon minket vagy írjon az alábbi űrlapon.</p>
+    </div>
+    <div class="contact-grid">
+      <!-- Info -->
+      <div class="contact-info">
+        <div class="contact-block">
+          <div class="contact-icon">📍</div>
+          <div class="contact-block-text">
+            <h4>Cím</h4>
+            <p>[Utca, házszám]<br/>2370 Dabas, Magyarország</p>
+          </div>
+        </div>
+        <div class="contact-block">
+          <div class="contact-icon">📞</div>
+          <div class="contact-block-text">
+            <h4>Telefon</h4>
+            <a href="tel:[telefonszám]">[+36 XX XXX XXXX]</a>
+          </div>
+        </div>
+        <div class="contact-block">
+          <div class="contact-icon">📧</div>
+          <div class="contact-block-text">
+            <h4>Email</h4>
+            <a href="mailto:[email]">[email@ligetbistrobar.hu]</a>
+          </div>
+        </div>
+        <div class="contact-block">
+          <div class="contact-icon">🕐</div>
+          <div class="contact-block-text">
+            <h4>Nyitvatartás</h4>
+            <div class="hours-table">
+              <span class="day">H–P</span><span>[10:00 – 22:00]</span>
+              <span class="day">Szombat</span><span>[11:00 – 23:00]</span>
+              <span class="day">Vasárnap</span><span>[11:00 – 21:00]</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Map -->
+        <div class="contact-map">
+          <div class="map-placeholder">
+            <div class="map-icon">🗺️</div>
+            <p>Dabas, Magyarország</p>
+            <a href="https://maps.google.com/?q=Dabas+Liget+BistroBar" target="_blank">Megnyitás Google Térképen</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form -->
+      <div>
+        <form class="contact-form" onsubmit="handleSubmit(event)">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="name">Neve</label>
+              <input type="text" id="name" placeholder="Kovács János" required />
+            </div>
+            <div class="form-group">
+              <label for="phone">Telefonszám</label>
+              <input type="tel" id="phone" placeholder="+36 XX XXX XXXX" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="email">Email cím</label>
+            <input type="email" id="email" placeholder="pelda@email.hu" />
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="date">Dátum</label>
+              <input type="date" id="date" />
+            </div>
+            <div class="form-group">
+              <label for="guests">Vendégek száma</label>
+              <input type="number" id="guests" placeholder="2" min="1" max="50" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="message">Üzenet / Megjegyzés</label>
+            <textarea id="message" placeholder="Írd ide kéréseidet, pl. különleges alkalom, allergének..."></textarea>
+          </div>
+          <button type="submit" class="btn-primary" style="width:100%;justify-content:center;">
+            Foglalás küldése →
+          </button>
+          <p style="color:#5a8a6a;font-size:0.78rem;text-align:center;">
+            Hamarosan felvesszük Önnel a kapcsolatot a foglalás megerősítéséhez.
+          </p>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- SOCIAL BAR -->
+  <div class="social-bar">
+    <p>Kövessen minket:</p>
+    <a href="https://www.facebook.com/p/Liget-BistroBar-Dabas-61556548511721/" target="_blank" class="social-link">
+      📘 Facebook
+    </a>
+    <a href="#" class="social-link">📸 Instagram</a>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-logo">Liget <span>Bistro</span>Bar</div>
+    <p style="margin-bottom:4px;">2370 Dabas, Magyarország</p>
+    <p>© 2025 Liget BistroBar. Minden jog fenntartva.</p>
+  </footer>
+
+  <script>
+    // Tab switching
+    function switchTab(panelId, btn) {
+      document.querySelectorAll('.menu-panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById(panelId).classList.add('active');
+      btn.classList.add('active');
+    }
+
+    // Form submit placeholder
+    function handleSubmit(e) {
+      e.preventDefault();
+      alert('Köszönjük a foglalási kérését! Hamarosan felvesszük Önnel a kapcsolatot.');
+      e.target.reset();
+    }
+
+    // Sticky nav shadow on scroll
+    window.addEventListener('scroll', () => {
+      const nav = document.querySelector('nav');
+      nav.style.boxShadow = window.scrollY > 60 ? '0 4px 20px rgba(0,0,0,0.3)' : 'none';
+    });
+
+    // Smooth active nav highlight
+    const sections = document.querySelectorAll('section[id], div[id]');
+    const navLinks = document.querySelectorAll('nav ul li a');
+    window.addEventListener('scroll', () => {
+      let current = '';
+      sections.forEach(sec => {
+        if (window.scrollY >= sec.offsetTop - 100) current = sec.id;
+      });
+      navLinks.forEach(a => {
+        a.style.color = a.getAttribute('href') === '#' + current ? 'var(--terracotta)' : '';
+      });
+    });
+
+    // Fade-in on scroll
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateY(0)';
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.menu-item, .about-feature, .contact-block, .gallery-item').forEach(el => {
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(20px)';
+      el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+      observer.observe(el);
+    });
+  </script>
+
+</body>
+</html>
